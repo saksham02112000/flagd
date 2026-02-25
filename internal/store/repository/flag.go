@@ -1,17 +1,13 @@
 package repository
 
 import (
+	"context"
 	"flagd/internal/domain"
-	"flagd/internal/store/postgres"
 )
 
 type FlagRepository interface {
-	GetById(id string) (*domain.Flag, error)
-	Create(flag *domain.Flag) error
-	Update(flag *domain.Flag) error
-	Delete(id string) error
-}
-
-func NewFlagRepository() *postgres.PostgresFlagRepository {
-	return &postgres.PostgresFlagRepository{}
+	GetById(ctx context.Context, id string) (*domain.Flag, error)
+	Create(ctx context.Context, key string, name string, description string) (*domain.Flag, error)
+	Update(ctx context.Context, flag *domain.Flag) error
+	Delete(ctx context.Context, id string) error
 }

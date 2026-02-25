@@ -3,8 +3,10 @@ package main
 import (
 	"flagd/config"
 	"flagd/config/client"
+	"flagd/internal/logger"
 	"flagd/internal/routes"
 	"log"
+	"os"
 
 	"github.com/gofiber/fiber/v3"
 )
@@ -16,10 +18,12 @@ func main() {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
+	appLogger := logger.New(os.Getenv("ENV"))
+
 	postgres := client.ConnectPostgres(*cfg)
 	redis := client.ConnectRedis(*cfg)
 
-	c := routes.Build(cfg, postgres, redis)
+	c := routes.Build(cfg, postgres, redis, appLogger)
 	routes.SetupHandlers(app, c)
 
 	app.Listen(":8080")

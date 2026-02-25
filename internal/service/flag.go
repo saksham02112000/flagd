@@ -1,32 +1,34 @@
 package service
 
 import (
+	"context"
 	"flagd/internal/domain"
+	"flagd/internal/logger"
 	"flagd/internal/store/repository"
 )
 
-
-type FlagService struct{
+type FlagService struct {
 	flagRepository repository.FlagRepository
 }
 
-
-func NewFlagService(flagRepository repository.FlagRepository) *FlagService{
+func NewFlagService(flagRepository repository.FlagRepository) *FlagService {
 	return &FlagService{flagRepository: flagRepository}
 }
 
-func (s *FlagService) GetById(id string) (*domain.Flag, error){
-	return s.flagRepository.GetById(id)
+func (s *FlagService) GetById(ctx context.Context, id string) (*domain.Flag, error) {
+	return s.flagRepository.GetById(ctx, id)
 }
 
-func (s *FlagService) Create(flag *domain.Flag) error{
-	return s.flagRepository.Create(flag)
-}
+func (s *FlagService) CreateFlag(ctx context.Context, key string, name string, description string) (*domain.Flag, error) {
+	log := logger.FromContext(ctx)
+	log.InfoContext(ctx, "Creating flag", "key", key, "name", name, "description", description)
 
-func (s *FlagService) Update(flag *domain.Flag) error{
-	return s.flagRepository.Update(flag)
-}
+	flag, err := s.flagRepository.Create(ctx, key, name, description)
+	if err != nil {
+		log.Error("failed to create flag", "key", key, "error", err)
+		return nil, err
+	}
 
-func (s *FlagService) Delete(id string) error{
-	return s.flagRepository.Delete(id)
+	log.Info("flag created", "id", flag.ID, "key", flag.Key)
+	return flag, nil
 }

@@ -1,12 +1,13 @@
 package domain
 
+import "time"
 
-type Flag struct{
-	id	string `json:"id"`
-	key string `json:"key"`
-	name string `json:"name"`
-	description string `json:"description"`
-	created_at string `json:"created_at"`
-	updated_at string `json:"updated_at"`
-	archieved_at string `json:"archieved_at"`
+type Flag struct {
+	ID          string     `json:"id"`
+	Key         string     `json:"key"`
+	Name        string     `json:"name"`
+	Description string     `json:"description"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
+	ArchivedAt  *time.Time `json:"archived_at"`
 }
