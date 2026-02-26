@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -10,7 +11,7 @@ import (
 type Config struct {
 	DatabaseURL string
 	RedisURL    string
-	Port        string
+	Port        int
 }
 
 func LoadConfig() (*Config, error) {
@@ -18,24 +19,23 @@ func LoadConfig() (*Config, error) {
 		return nil, fmt.Errorf("error loading .env file: %w", err)
 	}
 
-	cfg := &Config{
-		DatabaseURL: os.Getenv("DATABASE_URL"),
-		RedisURL:    os.Getenv("REDIS_URL"),
-		Port:        os.Getenv("PORT"),
-	}
+	cfg := &Config{}
 
-	required := map[string]*string{
-		"DATABASE_URL": &cfg.DatabaseURL,
-		"REDIS_URL":    &cfg.RedisURL,
-		"PORT":         &cfg.Port,
-	}
-	for key, dest := range required {
-		val := os.Getenv(key)
-		if val == "" {
+	required := []string{"DATABASE_URL", "REDIS_URL", "PORT"}
+	for _, key := range required {
+		if os.Getenv(key) == "" {
 			return nil, fmt.Errorf("required env var %q is not set", key)
 		}
-		*dest = val
 	}
+
+	cfg.DatabaseURL = os.Getenv("DATABASE_URL")
+	cfg.RedisURL = os.Getenv("REDIS_URL")
+
+	port, err := strconv.Atoi(os.Getenv("PORT"))
+	if err != nil {
+		return nil, fmt.Errorf("PORT must be a valid integer: %w", err)
+	}
+	cfg.Port = port
 
 	return cfg, nil
 }

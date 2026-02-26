@@ -5,6 +5,7 @@ import (
 	"flagd/config/client"
 	"flagd/internal/logger"
 	"flagd/internal/routes"
+	"fmt"
 	"log"
 	"os"
 
@@ -21,11 +22,14 @@ func main() {
 	appLogger := logger.New(os.Getenv("ENV"))
 
 	postgres := client.ConnectPostgres(*cfg)
+	defer postgres.Close()
+
 	redis := client.ConnectRedis(*cfg)
+	defer redis.Close()
 
 	c := routes.Build(cfg, postgres, redis, appLogger)
 	routes.SetupHandlers(app, c)
 
-	app.Listen(":8080")
-
+	addr := fmt.Sprintf(":%d", cfg.Port)
+	log.Fatal(app.Listen(addr))
 }

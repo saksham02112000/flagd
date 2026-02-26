@@ -9,11 +9,11 @@ import (
 	"log/slog"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Container struct {
-	DB     *pgx.Conn
+	DB     *pgxpool.Pool
 	Redis  *redis.Client
 	Config *config.Config
 	Logger *slog.Logger
@@ -25,7 +25,7 @@ type Container struct {
 	FlagHandler *handler.FlagHandler
 }
 
-func Build(cfg *config.Config, db *pgx.Conn, rdb *redis.Client, logger *slog.Logger) *Container {
+func Build(cfg *config.Config, db *pgxpool.Pool, rdb *redis.Client, logger *slog.Logger) *Container {
 	c := &Container{
 		DB:     db,
 		Redis:  rdb,

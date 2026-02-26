@@ -6,15 +6,14 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func ConnectPostgres(config config.Config) *pgx.Conn {
-	conn, err := pgx.Connect(context.Background(), config.DatabaseURL)
+func ConnectPostgres(config config.Config) *pgxpool.Pool {
+	pool, err := pgxpool.New(context.Background(), config.DatabaseURL)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
 		os.Exit(1)
 	}
-	// defer conn.Close(context.Background())
-	return conn
+	return pool
 }
